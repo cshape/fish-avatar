@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Track } from 'livekit-client';
 import { motion } from 'motion/react';
-import { VideoTrack, useTracks } from '@livekit/components-react';
+import { VideoTrack, useSessionContext, useTracks } from '@livekit/components-react';
 import { WaveformLoader } from '@/components/app/waveform-loader';
 import { cn } from '@/lib/shadcn/utils';
 
@@ -16,6 +16,7 @@ import { cn } from '@/lib/shadcn/utils';
  * The moment the track arrives we reveal the video immediately, whatever the bar reads.
  */
 export function AvatarTile({ className }: { className?: string }) {
+  const { isConnected } = useSessionContext();
   const tracks = useTracks([Track.Source.Camera], { onlySubscribed: true });
   const avatarTrack = tracks.find((t) => t.publication && !t.participant.isLocal);
 
@@ -30,6 +31,12 @@ export function AvatarTile({ className }: { className?: string }) {
         <VideoTrack trackRef={avatarTrack} className="h-full w-full object-cover" />
       </motion.div>
     );
+  }
+
+  // While the session is tearing down (End Call), the avatar track drops but the view
+  // is still fading out — show nothing rather than flashing the loader.
+  if (!isConnected) {
+    return <div className={cn('rounded-3xl', className)} />;
   }
 
   return <AvatarLoader className={className} />;
