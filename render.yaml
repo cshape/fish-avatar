@@ -1,0 +1,71 @@
+# Render Blueprint: two services, one repo, no Docker.
+#
+# Setup (one time):
+#   1. Push this repo to GitHub.
+#   2. In the Render dashboard: New → Blueprint → pick this repo.
+#      Render reads render.yaml and offers to create both services.
+#   3. Fill in the env-var group `fish-avatar-shared` with your real keys.
+#      (Same values you have in fish/.env.local and web/.env.local.)
+#
+# Plans: both services run on Starter so neither sleeps. The web service can
+# drop to Render's free tier to save money, but it spins down after ~15 min idle
+# (cold-start delays of ~50s); Render workers have no free tier.
+
+services:
+  # Next.js frontend: serves the landing page + the /api/token route that mints
+  # LiveKit access tokens.
+  - type: web
+    name: fish-avatar-web
+    runtime: node
+    rootDir: web
+    plan: starter
+    buildCommand: pnpm install --frozen-lockfile && pnpm build
+    startCommand: pnpm start
+    autoDeploy: true
+    envVars:
+      - fromGroup: fish-avatar-shared
+
+  # Python agent worker: registers with LiveKit Cloud and gets dispatched into
+  # rooms as users join. No inbound port.
+  - type: worker
+    name: fish-avatar-agent
+    runtime: python
+    rootDir: fish
+    plan: starter
+    buildCommand: pip install uv && uv sync --frozen && uv run python src/agent.py download-files
+    startCommand: uv run python src/agent.py start
+    autoDeploy: true
+    envVars:
+      - fromGroup: fish-avatar-shared
+      # Render only persists files under /opt/render/project/src/ between build
+      # and runtime. The HF / torch caches default to $HOME/.cache, which sits
+      # outside that tree and gets wiped — so the silero VAD + turn-detector
+      # weights downloaded at build time vanish before `start`. Pin both caches
+      # inside the project tree so they survive.
+      - key: HF_HOME
+        value: /opt/render/project/src/fish/.cache/huggingface
+      - key: TORCH_HOME
+        value: /opt/render/project/src/fish/.cache/torch
+      - key: XDG_CACHE_HOME
+        value: /opt/render/project/src/fish/.cache
+
+envVarGroups:
+  - name: fish-avatar-shared
+    envVars:
+      # LiveKit Cloud project (both services connect to the same one).
+      - key: LIVEKIT_URL
+        sync: false
+      - key: LIVEKIT_API_KEY
+        sync: false
+      - key: LIVEKIT_API_SECRET
+        sync: false
+      # Provider API keys (worker-only, but harmless on web).
+      - key: SONIOX_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: FISH_API_KEY
+        sync: false
+      # Beyond Presence avatar (worker-only).
+      - key: BEY_API_KEY
+        sync: false

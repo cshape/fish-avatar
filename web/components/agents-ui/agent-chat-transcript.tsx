@@ -1,0 +1,141 @@
+'use client';
+
+import { type ComponentProps } from 'react';
+import { AnimatePresence } from 'motion/react';
+import { type AgentState, type ReceivedMessage } from '@livekit/components-react';
+import { AgentChatIndicator } from '@/components/agents-ui/agent-chat-indicator';
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from '@/components/ai-elements/conversation';
+import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
+
+// Strip expressive delivery markup so it doesn't render in the chat transcript —
+// it's TTS-only and looks like noise on screen. The agent now emits the SDK's
+// abstract XML markup (e.g. <expression value="excited"/>, <sound …/>, <break …/>),
+// which the Agents framework already strips server-side before the transcript reaches
+// us. This is defense-in-depth: it also catches a tag that flashes mid-stream and any
+// stray Fish-native [brackets] the model might still freelance.
+function stripEmotionTags(text: string): string {
+  return (
+    text
+      // Complete <tag …/> or <tag>…</tag> markup.
+      .replace(/<\/?[a-zA-Z][^<>]*>/g, '')
+      // A still-streaming, not-yet-closed XML tag (e.g. "<expression value=" before
+      // the ">" arrives) — hide from the trailing "<" so nothing flickers mid-stream.
+      .replace(/<[^<>]*$/, '')
+      // Complete [tag] markers.
+      .replace(/\[[^\]]*\]/g, '')
+      // A still-streaming, not-yet-closed tag (e.g. "[speaks warmly" before the
+      // "]" arrives). Without this it briefly renders as raw text — and Streamdown
+      // reads the "[" as the start of a markdown link, flashing it blue — until the
+      // closing bracket lands and the complete-tag rule above removes it. Hide it
+      // from the trailing "[" to end-of-string so nothing flickers mid-stream.
+      .replace(/\[[^\]]*$/, '')
+      // Safety net: the prompt tells the model to keep sound effects inside
+      // [brackets] with no spoken text, but it occasionally freelances a stray
+      // laugh/sigh as "(heh)", "*laughs*", or bare "haha"/"heh heh". Strip those
+      // known tokens so they neither render nor read as noise. Deliberately
+      // narrow — we don't strip all parentheses.
+      .replace(
+        /[(*]\s*(?:chuckl\w*|laugh\w*|sigh\w*|groan\w*|gasp\w*|yawn\w*|hehe?|haha?|ahem)\s*[)*]/gi,
+        ''
+      )
+      .replace(/\b(?:(?:heh|hah?|ha)[\s,]*){2,}/gi, '')
+      // The model sometimes wraps its delivery tags in backticks (mirroring how
+      // the prompt formats them, e.g. `[playful]`). The [tag] strip above removes
+      // the inside but leaves the backticks orphaned, so drop any stray backticks
+      // (and asterisks) — a voice reply never has legitimate markdown formatting.
+      .replace(/[`*]+/g, '')
+      .replace(/\s+([,.!?])/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
+}
+
+/**
+ * Props for the AgentChatTranscript component.
+ */
+export interface AgentChatTranscriptProps extends ComponentProps<'div'> {
+  /**
+   * The current state of the agent. When 'thinking', displays a loading indicator.
+   */
+  agentState?: AgentState;
+  /**
+   * Array of messages to display in the transcript.
+   * @defaultValue []
+   */
+  messages?: ReceivedMessage[];
+  /**
+   * Additional CSS class names to apply to the conversation container.
+   */
+  className?: string;
+}
+
+/**
+ * A chat transcript component that displays a conversation between the user and agent.
+ * Shows messages with timestamps and origin indicators, plus a thinking indicator
+ * when the agent is processing.
+ *
+ * @extends ComponentProps<'div'>
+ *
+ * @example
+ * ```tsx
+ * <AgentChatTranscript
+ *   agentState={agentState}
+ *   messages={chatMessages}
+ * />
+ * ```
+ */
+function MessageRow({ receivedMessage }: { receivedMessage: ReceivedMessage }) {
+  const { timestamp, from, message } = receivedMessage;
+  const locale = navigator?.language ?? 'en-US';
+  const messageOrigin = from?.isLocal ? 'user' : 'assistant';
+  const time = new Date(timestamp);
+  const title = time.toLocaleTimeString(locale, { timeStyle: 'full' });
+
+  return (
+    <Message title={title} from={messageOrigin}>
+      <MessageContent>
+        <MessageResponse>{stripEmotionTags(message)}</MessageResponse>
+      </MessageContent>
+    </Message>
+  );
+}
+
+function TranscriptMessages({ messages }: { messages: ReceivedMessage[] }) {
+  return (
+    <>
+      {messages.map((m) => (
+        <MessageRow key={m.id} receivedMessage={m} />
+      ))}
+    </>
+  );
+}
+
+export function AgentChatTranscript({
+  agentState,
+  messages = [],
+  className,
+  ...props
+}: AgentChatTranscriptProps) {
+  return (
+    <Conversation className={className} {...props}>
+      <ConversationContent>
+        <TranscriptMessages messages={messages} />
+        <ThinkingIndicator agentState={agentState} />
+      </ConversationContent>
+      <ConversationScrollButton />
+    </Conversation>
+  );
+}
+
+// Shows the "preparing a response" dots when the agent is thinking.
+function ThinkingIndicator({ agentState }: { agentState?: AgentState }) {
+  return (
+    <AnimatePresence>
+      {agentState === 'thinking' && <AgentChatIndicator size="sm" />}
+    </AnimatePresence>
+  );
+}
