@@ -1,8 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Track } from 'livekit-client';
 import { type MotionProps, motion } from 'motion/react';
-import { useSessionContext } from '@livekit/components-react';
+import {
+  useLocalParticipant,
+  useSessionContext,
+  useTracks,
+  useVoiceAssistant,
+} from '@livekit/components-react';
 import {
   AgentControlBar,
   type AgentControlBarControls,
@@ -46,6 +52,24 @@ export function AgentSessionView_01({
   ...props
 }: React.ComponentProps<'section'> & AgentSessionView_01Props) {
   const session = useSessionContext();
+
+  // Mic gate: we connect with the mic disabled (see view-controller's start()). Re-enable
+  // it the first time the avatar is up AND Fish has started speaking, so the agent never
+  // hears stray input during load and the user can't talk over the greeting. After that
+  // the user controls the mic via the control bar.
+  const { localParticipant } = useLocalParticipant();
+  const { state: agentState } = useVoiceAssistant();
+  const cameraTracks = useTracks([Track.Source.Camera], { onlySubscribed: true });
+  const avatarReady = cameraTracks.some((t) => t.publication && !t.participant.isLocal);
+  const micOpenedRef = useRef(false);
+
+  useEffect(() => {
+    if (micOpenedRef.current) return;
+    if (avatarReady && agentState === 'speaking') {
+      micOpenedRef.current = true;
+      void localParticipant?.setMicrophoneEnabled(true);
+    }
+  }, [avatarReady, agentState, localParticipant]);
 
   // Voice-only, no transcript: the bottom bar is just mic + end call.
   const controls: AgentControlBarControls = {
