@@ -21,7 +21,7 @@ Use `uv` for everything. App code lives under `src/` with `agent.py` as the entr
 ## Stack
 
 - **STT**: Soniox real-time `stt-rt-v5` (`livekit-plugins-soniox`, via the `livekit-agents[soniox]` extra). Multilingual with `enable_language_identification=True` (default) so the user can switch languages mid-call; `language_hints` bias toward Fish's code-switch set without restricting detection. Needs `SONIOX_API_KEY`. (Swapped off AssemblyAI, which was English-only.)
-- **LLM**: OpenAI `gpt-5.4-mini` (`livekit-plugins-openai`, direct via `OPENAI_API_KEY`); override with `OPENAI_MODEL`. The LLM is set on the `Assistant` (Agent), not the session.
+- **LLM**: chosen by `src/llm.py:build_llm()`, set on the `Assistant` (Agent), not the session. Default is OpenAI `gpt-5.4-mini` (`livekit-plugins-openai`, direct via `OPENAI_API_KEY`, override with `OPENAI_MODEL`). Set `LLM_BASE_URL` to point the same OpenAI-compatible plugin at our own endpoint instead — e.g. the self-hosted Gemma served via SGLang at `https://sglang-fish-agent-gemma4-26b-a4b.dallas.api.fish.audio/v1` (`LLM_MODEL=google/gemma-4-26B-A4B-it`, `LLM_API_KEY=<bearer>`, optional `LLM_TEMPERATURE`). No SDK fork — the plugin is a generic `/v1/chat/completions` client, so `livekit-agents` stays freely upgradable; the provider choice is the one seam we own (`src/llm.py`).
 - **TTS**: Fish Audio `s2.1-pro` (`livekit-plugins-fishaudio`), `latency_mode="low"`, `output_format="pcm"` (raw PCM avoids a first-word WebRTC crackle the WAV-container path produces). Voice = Stellan; override with `FISH_VOICE_ID`.
 - **Avatar**: Beyond Presence (`bey`, via the `livekit-agents[bey]` extra). `bey.AvatarSession(avatar_id=...)`, default stock avatar; override with `BEY_AVATAR_ID`.
 - **VAD / turn**: silero VAD only (no separate turn-detector model — keeps the worker inside Render's 512MB Starter tier).
@@ -46,7 +46,12 @@ SONIOX_API_KEY=...    # Soniox real-time multilingual STT (https://console.sonio
 OPENAI_API_KEY=...
 FISH_API_KEY=...      # Fish reads FISH_API_KEY, not FISH_AUDIO_API_KEY
 BEY_API_KEY=...       # Beyond Presence (https://app.bey.dev → API keys)
-OPENAI_MODEL=gpt-5.4-mini   # optional
+OPENAI_MODEL=gpt-5.4-mini   # optional; used only when LLM_BASE_URL is unset
+# Own LLM (optional): point the openai plugin at our endpoint instead of OpenAI
+LLM_BASE_URL=https://sglang-fish-agent-gemma4-26b-a4b.dallas.api.fish.audio/v1
+LLM_MODEL=google/gemma-4-26B-A4B-it
+LLM_API_KEY=...       # bearer token for LLM_BASE_URL
+# LLM_TEMPERATURE=0.6
 # FISH_VOICE_ID=... / BEY_AVATAR_ID=...   # optional overrides
 ```
 

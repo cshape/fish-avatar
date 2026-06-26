@@ -69,3 +69,11 @@ envVarGroups:
       # Beyond Presence avatar (worker-only).
       - key: BEY_API_KEY
         sync: false
+      # Own LLM: point the openai plugin at our self-hosted Gemma (worker-only).
+      # Drop LLM_BASE_URL to fall back to direct OpenAI (OPENAI_MODEL).
+      - key: LLM_BASE_URL
+        value: https://sglang-fish-agent-gemma4-26b-a4b.dallas.api.fish.audio/v1
+      - key: LLM_MODEL
+        value: google/gemma-4-26B-A4B-it
+      - key: LLM_API_KEY
+        sync: false

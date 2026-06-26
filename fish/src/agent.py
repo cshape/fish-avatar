@@ -14,7 +14,9 @@ from livekit.agents import (
     JobProcess,
     cli,
 )
-from livekit.plugins import bey, fishaudio, openai, silero, soniox
+from livekit.plugins import bey, fishaudio, silero, soniox
+
+from llm import build_llm
 
 logger = logging.getLogger("agent")
 load_dotenv(".env.local")
@@ -141,9 +143,9 @@ def greeting_for(language_name: str) -> str:
 class Assistant(Agent):
     def __init__(self) -> None:
         super().__init__(
-            # Direct OpenAI (own API key). gpt-5.4-mini is fast/reliable and handles
-            # multilingual replies well; env-overridable.
-            llm=openai.LLM(model=os.getenv("OPENAI_MODEL", "gpt-5.4-mini")),
+            # Provider chosen by env (see llm.build_llm): our own OpenAI-compatible
+            # endpoint when LLM_BASE_URL is set, else direct OpenAI gpt-5.4-mini.
+            llm=build_llm(default_openai_model="gpt-5.4-mini"),
             instructions=INSTRUCTIONS,
         )
 
