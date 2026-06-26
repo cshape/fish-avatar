@@ -39,10 +39,10 @@ The order matters — see `src/agent.py`:
 ## `.env.local` (gitignored)
 
 ```
-LIVEKIT_URL=ws://localhost:7880
-LIVEKIT_API_KEY=devkey
-LIVEKIT_API_SECRET=secret
-ASSEMBLYAI_API_KEY=...
+LIVEKIT_URL=wss://<project>.livekit.cloud   # the avatar needs LiveKit Cloud, not localhost
+LIVEKIT_API_KEY=...
+LIVEKIT_API_SECRET=...
+SONIOX_API_KEY=...    # Soniox real-time multilingual STT (https://console.soniox.com)
 OPENAI_API_KEY=...
 FISH_API_KEY=...      # Fish reads FISH_API_KEY, not FISH_AUDIO_API_KEY
 BEY_API_KEY=...       # Beyond Presence (https://app.bey.dev → API keys)
@@ -99,5 +99,5 @@ tests/
 - **Voice-only, no transcript.** The session view (`agent-session-view-01/components/agent-session-block.tsx`) is just a centered avatar + a minimal mic/end-call control bar. The transcript, pre-connect shimmer, mode toggle, and mood ring are all gone.
 - The avatar renders via `components/app/avatar-tile.tsx` (`useTracks([Track.Source.Camera])` → first remote camera track → `<VideoTrack>`), centered. Until the track arrives it shows the **Fish Audio whale animation** (`components/app/whale-loader.tsx` renders `public/fish.audio.riv` via `@rive-app/react-webgl2`, dynamic-imported with `ssr:false`; the `.riv` came from `~/code/fish/platform-web`) behind a progress bar that fills 0→95% over **20s**, then creeps +1%/3s to 99%. No "Connecting…" text. Track arrival reveals the video immediately.
 - `agent-chat-transcript.tsx` still exists but is no longer mounted (kept for reference; safe to delete).
-- Deploy: `render.yaml` (web + worker on Render Starter against LiveKit Cloud); env group `fish-avatar-shared` needs `BEY_API_KEY` in addition to the LiveKit/AssemblyAI/OpenAI/Fish keys.
+- Deploy: `render.yaml` (web + worker on Render Starter against LiveKit Cloud); env group `fish-avatar-shared` holds LiveKit / Soniox / OpenAI / Fish / Beyond Presence keys.
 ```

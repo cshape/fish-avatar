@@ -1,10 +1,11 @@
 # Voice + avatar agent demo
 
-A small voice agent you can talk to, with a real-time **video avatar**. It speaks
-with [Fish Audio](https://fish.audio)'s text-to-speech and shows a synchronized
-talking-head avatar from [Beyond Presence](https://www.beyondpresence.ai). Powered by
+A multilingual voice agent you can talk to, with a real-time **video avatar** — "Fish,"
+a sales agent for Fish Audio. It speaks with [Fish Audio](https://fish.audio)'s
+text-to-speech and shows a synchronized talking-head avatar from
+[Beyond Presence](https://www.beyondpresence.ai). Powered by
 [Fish Audio](https://fish.audio), [Beyond Presence](https://www.beyondpresence.ai),
-[AssemblyAI](https://www.assemblyai.com), [OpenAI](https://openai.com), and
+[Soniox](https://soniox.com), [OpenAI](https://openai.com), and
 [LiveKit Agents](https://docs.livekit.io/agents/).
 
 ```
@@ -19,7 +20,7 @@ Dockerfile), so you can run the whole thing together or grab just one half.
 ## Prereqs
 
 - A [LiveKit Cloud](https://cloud.livekit.io) project (free tier is plenty)
-- API keys for [Fish Audio](https://fish.audio), [Beyond Presence](https://app.bey.dev), [AssemblyAI](https://www.assemblyai.com), and [OpenAI](https://platform.openai.com)
+- API keys for [Fish Audio](https://fish.audio), [Beyond Presence](https://app.bey.dev), [Soniox](https://console.soniox.com), and [OpenAI](https://platform.openai.com)
 - Then either [Docker](https://docs.docker.com/get-started/get-docker/) (Compose path) **or**
   [`uv`](https://docs.astral.sh/uv/getting-started/installation/) + [`pnpm`](https://pnpm.io/installation) (Node 20+) for the local path
 
@@ -62,18 +63,21 @@ that provisions both services from a single click — no Docker needed.
    `render.yaml` and creates both services — `fish-avatar-web` (Next.js frontend)
    and `fish-avatar-agent` (Python worker).
 3. Fill in the `fish-avatar-shared` env-var group with your real LiveKit / Fish /
-   Beyond Presence / AssemblyAI / OpenAI keys.
+   Beyond Presence / Soniox / OpenAI keys.
 4. Hit deploy. Both services come up against the same LiveKit Cloud project.
 
 ## How it works
 
-- **Hit start and talk.** The landing page is a single button. On connect, a
-  LiveKit room is created, the agent worker is dispatched into it by name
-  (`fish-avatar`), and the Beyond Presence avatar worker joins the same room.
-- **Voice → avatar.** The agent runs an STT → LLM → Fish Audio TTS pipeline. The
+- **Pick a language, hit start, talk.** The landing page has an inline language
+  picker (8 languages); the choice rides agent metadata to the worker, which opens
+  in that language with a matching native Fish voice. On connect, a LiveKit room is
+  created, the agent is dispatched into it by name (`fish-avatar`), and the Beyond
+  Presence avatar worker joins the same room.
+- **Voice → avatar.** The agent runs a Soniox STT → OpenAI LLM → Fish Audio TTS
+  pipeline (Soniox auto-detects language, so the user can switch mid-call). The
   avatar session reroutes the agent's audio to the Beyond Presence worker, which
-  publishes a video track lip-synced to the speech. The frontend renders that
-  video as the centered talking head, with a live transcript beneath it.
+  publishes a video track lip-synced to the speech. The frontend renders that video
+  as the centered talking head, with transient captions beneath it.
 
 See `fish/CLAUDE.md` for the agent-side wiring and `fish/src/agent.py` for the code.
 

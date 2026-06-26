@@ -1,9 +1,11 @@
 # Voice + avatar agent — agent worker
 
 The backend half of the [voice + avatar agent demo](../README.md): a Python
-[LiveKit Agents](https://docs.livekit.io/agents/) worker that speaks with
-[Fish Audio](https://fish.audio)'s TTS and drives a real-time
-[Beyond Presence](https://www.beyondpresence.ai) video avatar.
+[LiveKit Agents](https://docs.livekit.io/agents/) worker — "Fish," a multilingual
+sales agent for Fish Audio that speaks with [Fish Audio](https://fish.audio)'s TTS
+and drives a real-time [Beyond Presence](https://www.beyondpresence.ai) video avatar.
+It detects the user's language (Soniox) and replies in kind; the opening language is
+chosen on the landing page and rides agent metadata to pick a native Fish voice.
 
 This directory is self-contained — you can run it on its own and point any
 [compatible frontend](https://docs.livekit.io/frontends/) (or the
@@ -11,7 +13,7 @@ This directory is self-contained — you can run it on its own and point any
 
 ## Stack
 
-- **STT** — AssemblyAI streaming (`livekit-plugins-assemblyai`)
+- **STT** — Soniox real-time multilingual (`livekit-plugins-soniox`, via the `livekit-agents[soniox]` extra); automatic language identification, so the user can switch languages mid-call. Needs `SONIOX_API_KEY`.
 - **LLM** — OpenAI `gpt-5.4-mini` (`livekit-plugins-openai`, your `OPENAI_API_KEY`); override the model with `OPENAI_MODEL`
 - **TTS** — Fish Audio `s2.1-pro` (`livekit-plugins-fishaudio`); override the voice with `FISH_VOICE_ID`
 - **Avatar** — Beyond Presence (`bey`, via the `livekit-agents[bey]` extra); override the avatar with `BEY_AVATAR_ID`
@@ -56,7 +58,7 @@ LIVEKIT_URL=wss://<your-project>.livekit.cloud
 LIVEKIT_API_KEY=
 LIVEKIT_API_SECRET=
 
-ASSEMBLYAI_API_KEY=
+SONIOX_API_KEY=    # Soniox real-time multilingual STT (https://console.soniox.com)
 OPENAI_API_KEY=
 FISH_API_KEY=      # Fish reads FISH_API_KEY (not FISH_AUDIO_API_KEY)
 BEY_API_KEY=       # Beyond Presence (https://app.bey.dev → API keys)

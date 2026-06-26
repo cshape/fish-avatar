@@ -23,10 +23,8 @@ export interface AppConfig {
   pageDescription: string;
   companyName: string;
 
-  supportsChatInput: boolean;
   supportsVideoInput: boolean;
   supportsScreenShare: boolean;
-  isPreConnectBufferEnabled: boolean;
 
   logo: string;
   startButtonText: string;
@@ -48,10 +46,8 @@ export const APP_CONFIG_DEFAULTS: AppConfig = {
     "Chat with a LiveKit voice agent running Fish Audio's text-to-speech, with a real-time " +
     'video avatar from Beyond Presence. Just hit start and say hi.',
 
-  supportsChatInput: false,
   supportsVideoInput: false,
   supportsScreenShare: false,
-  isPreConnectBufferEnabled: false,
 
   logo: '/lk-logo.svg',
   accent: '#002cf2',
