@@ -53,8 +53,9 @@ export function AgentSessionView_01({
 }: React.ComponentProps<'section'> & AgentSessionView_01Props) {
   const session = useSessionContext();
 
-  // Mic gate: we connect with the mic disabled (see view-controller's start()). Re-enable
-  // it the first time the avatar is up AND Fish has started speaking, so the agent never
+  // Mic gate: the mic is acquired at the Start click (see view-controller's start()) so
+  // the permission prompt rides that gesture. We mute it through load, then re-enable it
+  // the first time the avatar is up AND Fish has started speaking — so the agent never
   // hears stray input during load and the user can't talk over the greeting. After that
   // the user controls the mic via the control bar.
   const { localParticipant } = useLocalParticipant();
@@ -63,6 +64,13 @@ export function AgentSessionView_01({
   const avatarReady = cameraTracks.some((t) => t.publication && !t.participant.isLocal);
   const micOpenedRef = useRef(false);
 
+  // Mute the just-acquired mic until the gate opens.
+  useEffect(() => {
+    if (micOpenedRef.current || !localParticipant) return;
+    void localParticipant.setMicrophoneEnabled(false);
+  }, [localParticipant]);
+
+  // Open the gate once: avatar up AND Fish speaking.
   useEffect(() => {
     if (micOpenedRef.current) return;
     if (avatarReady && agentState === 'speaking') {

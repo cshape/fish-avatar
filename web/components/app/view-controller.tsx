@@ -47,10 +47,11 @@ export function ViewController({ appConfig, language, onLanguageChange }: ViewCo
           languages={LANGUAGES}
           language={language}
           onLanguageChange={onLanguageChange}
-          // Connect with the mic OFF — the session view re-enables it once the avatar
-          // is up and Fish has started greeting, so the agent never hears stray input
-          // during load and the user can't talk over the opener.
-          onStartCall={() => start({ tracks: { microphone: { enabled: false } } })}
+          // Acquire the mic at the Start click (so the permission prompt rides this user
+          // gesture), then the session view mutes it through load and re-enables it once
+          // the avatar is up and Fish has started greeting — so the agent never hears
+          // stray input during load and the user can't talk over the opener.
+          onStartCall={() => start({ tracks: { microphone: { enabled: true } } })}
         />
       )}
       {/* Session view */}
