@@ -208,6 +208,11 @@ async def my_agent(ctx: JobContext):
             params=soniox.STTOptions(
                 language_hints=LANGUAGE_HINTS,
                 enable_language_identification=True,
+                # Aggressive end-of-turn: was defaulting to 2000ms. Lower delay +
+                # higher sensitivity make Soniox finalize sooner on confident pauses.
+                # endpoint_sensitivity is stt-rt-v5 only (the plugin default model).
+                max_endpoint_delay_ms=700,
+                endpoint_sensitivity=0.4,
             )
         ),
         tts=fishaudio.TTS(
@@ -222,6 +227,10 @@ async def my_agent(ctx: JobContext):
         # Turn detection falls back to silero VAD — keeps the worker footprint small
         # enough for Render's 512MB Starter tier.
         vad=ctx.proc.userdata["vad"],
+        # Trust the STT's endpoint (no added floor); 1.5s is just a hard safety
+        # ceiling so the agent never hangs waiting on an unconfident endpoint.
+        min_endpointing_delay=0.0,
+        max_endpointing_delay=1.5,
     )
 
     # Beyond Presence avatar. `start` dispatches the avatar worker into the room and
