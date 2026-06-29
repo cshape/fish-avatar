@@ -231,6 +231,10 @@ async def my_agent(ctx: JobContext):
         # ceiling so the agent never hangs waiting on an unconfident endpoint.
         min_endpointing_delay=0.0,
         max_endpointing_delay=1.5,
+        # Start generating the reply on the preflight transcript, before the turn is
+        # fully committed, to shave reply latency. Safe here — no clone-read silence
+        # gate to race (unlike livekit-demo).
+        preemptive_generation=True,
     )
 
     # Beyond Presence avatar. `start` dispatches the avatar worker into the room and
