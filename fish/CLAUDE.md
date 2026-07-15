@@ -12,16 +12,21 @@ voice ecosystem, infra, languages, open weights, sales posture) live in `INSTRUC
 backed by Soniox multilingual STT and Fish's code-switching TTS.
 
 This was forked from `cshape/livekit-demo` (the Fish voice-cloning demo) and **stripped to
-basics**: no voice cloning, no expressive presets, no mood ring, and no fork dependency —
-it runs on released `livekit-agents`.
+basics**: no voice cloning, no expressive presets, no mood ring. Like livekit-demo, the SDK
+and ALL livekit plugins come from Cale's fork (`cshape/agents-expressive`, branch
+`cale/expressive-fish`, see `[tool.uv.sources]` in `pyproject.toml`) — the fork's fishaudio
+plugin keeps one prewarmed `/v1/tts/live` websocket per session (real `prewarm()` +
+`utils.ConnectionPool`), so the first utterance skips the ~330ms handshake. The fork is at
+1.6.2; PyPI plugins require `livekit-agents>=1.6.4`, so every plugin is pinned to the fork
+to keep the SDK from being bumped off it.
 
 Use `uv` for everything. App code lives under `src/` with `agent.py` as the entrypoint;
 `uv run ruff check src/` / `uv run ruff format src/` must stay green.
 
 ## Stack
 
-- **STT**: Soniox real-time `stt-rt-v5` (`livekit-plugins-soniox`, via the `livekit-agents[soniox]` extra). Multilingual with `enable_language_identification=True` (default) so the user can switch languages mid-call; `language_hints` bias toward Fish's code-switch set without restricting detection. Needs `SONIOX_API_KEY`. (Swapped off AssemblyAI, which was English-only.)
-- **LLM**: chosen by `src/llm.py:build_llm()`, set on the `Assistant` (Agent), not the session. Default is OpenAI `gpt-5.4-mini` (`livekit-plugins-openai`, direct via `OPENAI_API_KEY`, override with `OPENAI_MODEL`). Set `LLM_BASE_URL` to point the same OpenAI-compatible plugin at our own endpoint instead — e.g. the self-hosted Gemma served via SGLang at `https://sglang-fish-agent-gemma4-26b-a4b.dallas.api.fish.audio/v1` (`LLM_MODEL=google/gemma-4-26B-A4B-it`, `LLM_API_KEY=<bearer>`, optional `LLM_TEMPERATURE`). No SDK fork — the plugin is a generic `/v1/chat/completions` client, so `livekit-agents` stays freely upgradable; the provider choice is the one seam we own (`src/llm.py`).
+- **STT**: Soniox real-time `stt-rt-v5` (`livekit-plugins-soniox`, via the `livekit-agents[soniox]` extra). Multilingual with `enable_language_identification=True` (default) so the user can switch languages mid-call; `language_hints` bias toward Fish's code-switch set without restricting detection. End-of-turn is tuned max-aggressive: `max_endpoint_delay_ms=500` (the plugin floor) + `endpoint_sensitivity=1.0` (the max), with `min_endpointing_delay=0.0` on the session — back off if users get cut off mid-sentence. Needs `SONIOX_API_KEY`. (Swapped off AssemblyAI, which was English-only.)
+- **LLM**: chosen by `src/llm.py:build_llm()`, set on the `Assistant` (Agent), not the session. Default is OpenAI `gpt-5.4-mini` (`livekit-plugins-openai`, direct via `OPENAI_API_KEY`, override with `OPENAI_MODEL`). Set `LLM_BASE_URL` to point the same OpenAI-compatible plugin at our own endpoint instead — e.g. the self-hosted Gemma served via SGLang at `https://sglang-fish-agent-gemma4-26b-a4b.dallas.api.fish.audio/v1` (`LLM_MODEL=google/gemma-4-26B-A4B-it`, `LLM_API_KEY=<bearer>`, optional `LLM_TEMPERATURE`). The plugin is a generic `/v1/chat/completions` client — no LLM-specific fork changes; the provider choice is a seam we own (`src/llm.py`).
 - **TTS**: Fish Audio `s2.1-pro` (`livekit-plugins-fishaudio`), `latency_mode="low"`, `output_format="pcm"` (raw PCM avoids a first-word WebRTC crackle the WAV-container path produces). Voice = Stellan; override with `FISH_VOICE_ID`.
 - **Avatar**: Beyond Presence (`bey`, via the `livekit-agents[bey]` extra). `bey.AvatarSession(avatar_id=...)`, default stock avatar; override with `BEY_AVATAR_ID`.
 - **VAD / turn**: silero VAD only (no separate turn-detector model — keeps the worker inside Render's 512MB Starter tier).

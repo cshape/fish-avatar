@@ -550,8 +550,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "livekit-agents", extras = ["soniox", "openai", "silero", "bey"], specifier = ">=1.6.0" },
-    { name = "livekit-plugins-fishaudio", specifier = ">=1.6.0" },
+    { name = "livekit-agents", extras = ["bey", "openai", "silero", "soniox"], git = "https://github.com/cshape/agents-expressive.git?subdirectory=livekit-agents&branch=cale%2Fexpressive-fish" },
+    { name = "livekit-plugins-fishaudio", git = "https://github.com/cshape/agents-expressive.git?subdirectory=livekit-plugins%2Flivekit-plugins-fishaudio&branch=cale%2Fexpressive-fish" },
     { name = "python-dotenv" },
 ]
 
@@ -945,7 +945,7 @@ wheels = [
 
 [[package]]
 name = "livekit"
-version = "1.1.12"
+version = "1.1.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -955,19 +955,19 @@ dependencies = [
     { name = "protobuf" },
     { name = "types-protobuf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fa/2c/3e8412615a2f4b9abdd1dec54138f8810b58e1e5c366443c098d52ef1957/livekit-1.1.12.tar.gz", hash = "sha256:a8e3aa59a7299b136a2a5442f90a9c8a5a8188afe94ffeeb85873d6ceaabf939", size = 369150, upload-time = "2026-06-24T19:50:49.651Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6c/14/3197e09850aa65d0f0df90a8b7c24994e130e92403f935de1f2ae3ae387e/livekit-1.1.9.tar.gz", hash = "sha256:62d288c222208e76433cc6eabc00eb2927ecafaace511d90820889fd5597a52e", size = 353630, upload-time = "2026-05-28T14:34:18.935Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/39/6f/b2a1486f9f217043dbf52ed93bf6a77febd4d86615b02cddd7758a225f52/livekit-1.1.12-py3-none-macosx_10_15_x86_64.whl", hash = "sha256:7fe82d7f2ef76ef6f7d856581f4519c2870fcffe3c33a8b2e74315d7c0bbdadc", size = 10140961, upload-time = "2026-06-24T19:50:38.69Z" },
-    { url = "https://files.pythonhosted.org/packages/fb/de/656428ad72ce5b6911be2f084ead1e9c3b04d46015981de7e94177628a8d/livekit-1.1.12-py3-none-macosx_11_0_arm64.whl", hash = "sha256:3c33d6b6df872447d3295443eb4886b84b6d6045ce8b3627504ee840ddf908fb", size = 8965085, upload-time = "2026-06-24T19:50:40.945Z" },
-    { url = "https://files.pythonhosted.org/packages/8c/ce/572f3f15571625ee9f99f103f2a13503797ed80636d70ce0dd58034e5e1d/livekit-1.1.12-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:0f452415ec4c7c789bd99bc098dc19710f49249993b13335e5741de50fa423dc", size = 9974856, upload-time = "2026-06-24T19:50:43.329Z" },
-    { url = "https://files.pythonhosted.org/packages/db/d7/5a798f8ef40889c8236a05d1a3985a77114c2c8f4584ac118987d6f8d9d5/livekit-1.1.12-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:19611fb5fa6bd1e6366acc7526aecab1c8fa2afe9e579f73d34df575c667aa53", size = 11359455, upload-time = "2026-06-24T19:50:45.654Z" },
-    { url = "https://files.pythonhosted.org/packages/1d/45/f28e25888babc83a43769f428545c9ee781366a0ef22b4b479318c0f95bc/livekit-1.1.12-py3-none-win_amd64.whl", hash = "sha256:4e81a366a6c7a83b435d9de15760da70d4c13748b61eb8d5f000c9d279c8a39e", size = 10710076, upload-time = "2026-06-24T19:50:47.663Z" },
+    { url = "https://files.pythonhosted.org/packages/5a/a6/7f16535b70ce4261d94ed2eb6cb6905029c580faaf5772e13286e2c1feaf/livekit-1.1.9-py3-none-macosx_10_15_x86_64.whl", hash = "sha256:e472b6fc4ad796d4ca95ccc2c926fbfdf4c8a1b1f3e1d5bcc7bce54db4c893d5", size = 10064439, upload-time = "2026-05-28T14:34:07.461Z" },
+    { url = "https://files.pythonhosted.org/packages/ef/83/6fbf21f88723765d43154b5656d6ac5efdbad0e6e76c0da01f1ae4558669/livekit-1.1.9-py3-none-macosx_11_0_arm64.whl", hash = "sha256:18dc082ab6e6c620026bbca9a942068d1ff055460afd9909249babaac5ad6f04", size = 8895549, upload-time = "2026-05-28T14:34:10.618Z" },
+    { url = "https://files.pythonhosted.org/packages/de/f3/0ada8ac4ffa418ce7145b9bf4e0ed0585f54acfeab54df7d6c1e5395cbf2/livekit-1.1.9-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:975f2f77e3d089e0a5d0fc84590e8a6b98a8c8e0eda449a86edd789b58a1f6e0", size = 9899965, upload-time = "2026-05-28T14:34:12.656Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/34/bc5dbb70b86c8a1ee1016af64cfd2902a46c70bc927642bc04070f361e2f/livekit-1.1.9-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:34302a874cce94488ecc49daf4389117b16c48f7f151a7bdb48603b550219570", size = 11280510, upload-time = "2026-05-28T14:34:14.966Z" },
+    { url = "https://files.pythonhosted.org/packages/68/2e/465ae11edd75439311c021f6c9310f7c35cd347893fcc56f659658aadcaa/livekit-1.1.9-py3-none-win_amd64.whl", hash = "sha256:c31d2a3406bc75cf5edf4b457c9d54c665ebaae64e08800b03de622acd478381", size = 10637454, upload-time = "2026-05-28T14:34:17.003Z" },
 ]
 
 [[package]]
 name = "livekit-agents"
-version = "1.6.4"
-source = { registry = "https://pypi.org/simple" }
+version = "1.6.2"
+source = { git = "https://github.com/cshape/agents-expressive.git?subdirectory=livekit-agents&branch=cale%2Fexpressive-fish#1d7178232104a9b01d8372ea3574ac8cfcdb64ee" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
@@ -1002,10 +1002,6 @@ dependencies = [
     { name = "types-protobuf" },
     { name = "typing-extensions" },
     { name = "watchfiles" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/8d/a1/e681926fd3ddd3323a50b638e5c9f8d5cea68db0eaafcc040dbf65b5efeb/livekit_agents-1.6.4.tar.gz", hash = "sha256:deb1b47a1ab637c93ab675980bb4532fb01244604b41eda9d6e3ca268a52e794", size = 2561744, upload-time = "2026-06-24T20:49:24.032Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e4/bb/c50992829fadd273fed66ae761f87ed4296fdd37eba0d0bc8c79cdddd896/livekit_agents-1.6.4-py3-none-any.whl", hash = "sha256:5341849645f768ed8bd1d276688f2b6ea0e72574e2aab7206d4e18c5628a97cd", size = 2669501, upload-time = "2026-06-24T20:49:22.119Z" },
 ]
 
 [package.optional-dependencies]
@@ -1117,46 +1113,34 @@ wheels = [
 
 [[package]]
 name = "livekit-plugins-bey"
-version = "1.6.4"
-source = { registry = "https://pypi.org/simple" }
+version = "1.6.2"
+source = { git = "https://github.com/cshape/agents-expressive.git?subdirectory=livekit-plugins%2Flivekit-plugins-bey&branch=cale%2Fexpressive-fish#1d7178232104a9b01d8372ea3574ac8cfcdb64ee" }
 dependencies = [
     { name = "livekit-agents" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/40/1f/7aabacf0a09529857dd60118cffe0ff05b14eb4b9d6258a204bc49d12c74/livekit_plugins_bey-1.6.4.tar.gz", hash = "sha256:0ce057b076fac7e999790e5d0e2ef552bfa14ad38c0916c98ca89e9699da62b5", size = 5221, upload-time = "2026-06-24T20:49:39.206Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fe/ce/52433054de42cd4a5aa4e7a8f0a22fbfebcedd53de030185aca70f9c0016/livekit_plugins_bey-1.6.4-py3-none-any.whl", hash = "sha256:e8e19e9de057dfa061ac0d60425abb99baa7ae876dfc46eaf95cadb3df049aa8", size = 5246, upload-time = "2026-06-24T20:49:38.052Z" },
 ]
 
 [[package]]
 name = "livekit-plugins-fishaudio"
-version = "1.6.4"
-source = { registry = "https://pypi.org/simple" }
+version = "1.6.2"
+source = { git = "https://github.com/cshape/agents-expressive.git?subdirectory=livekit-plugins%2Flivekit-plugins-fishaudio&branch=cale%2Fexpressive-fish#1d7178232104a9b01d8372ea3574ac8cfcdb64ee" }
 dependencies = [
     { name = "livekit-agents", extra = ["codecs"] },
     { name = "msgpack" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/61/88/735f1064f0a25f23325bb90cdb749a9c0314d9ccff6a2696fbdfac67a1d6/livekit_plugins_fishaudio-1.6.4.tar.gz", hash = "sha256:4ee61e5c0794c4e40769a27968f4e1523a203e6775efb637128549a956d15475", size = 8123, upload-time = "2026-06-24T20:49:58.705Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fb/0f/97728ce75c7137763fafd9ab1a7d0c6c2f66cacc5cf14788098efb6613c4/livekit_plugins_fishaudio-1.6.4-py3-none-any.whl", hash = "sha256:8c85d24325825de79ea4b580db5c2ed0b8315bf9c44998f679d4d6152b0592a6", size = 8233, upload-time = "2026-06-24T20:49:57.728Z" },
-]
 
 [[package]]
 name = "livekit-plugins-openai"
-version = "1.6.4"
-source = { registry = "https://pypi.org/simple" }
+version = "1.6.2"
+source = { git = "https://github.com/cshape/agents-expressive.git?subdirectory=livekit-plugins%2Flivekit-plugins-openai&branch=cale%2Fexpressive-fish#1d7178232104a9b01d8372ea3574ac8cfcdb64ee" }
 dependencies = [
     { name = "livekit-agents", extra = ["codecs", "images"] },
     { name = "openai", extra = ["realtime"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e9/63/d27b63ccf068c2a0cbfdede4e2173e3295ae8b795b36c150baf35c7ca97c/livekit_plugins_openai-1.6.4.tar.gz", hash = "sha256:d9e3f537f38e61fa36a44061d87fc4c7ad3e2a89cf2c7bb9d1d7fed0042bb068", size = 45310, upload-time = "2026-06-24T20:50:48.173Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/db/a0/2ac8471ee3a09d297a34fb2a7cb10581bfdb1454f84020be16634193f91c/livekit_plugins_openai-1.6.4-py3-none-any.whl", hash = "sha256:5667a52e5158e9594c3b71a7da37961a0daf5bd2648f0055854bc1837372a47b", size = 52120, upload-time = "2026-06-24T20:50:46.93Z" },
-]
 
 [[package]]
 name = "livekit-plugins-silero"
-version = "1.6.4"
-source = { registry = "https://pypi.org/simple" }
+version = "1.6.2"
+source = { git = "https://github.com/cshape/agents-expressive.git?subdirectory=livekit-plugins%2Flivekit-plugins-silero&branch=cale%2Fexpressive-fish#1d7178232104a9b01d8372ea3574ac8cfcdb64ee" }
 dependencies = [
     { name = "livekit-agents" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -1165,21 +1149,13 @@ dependencies = [
     { name = "onnxruntime", version = "1.24.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "onnxruntime", version = "1.27.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fa/85/ae6e73640ade39968d64bf0737235a5ffe11e78948a061ddf7b7f4dbf894/livekit_plugins_silero-1.6.4.tar.gz", hash = "sha256:4a9bdf6d3ccb1c0433fd9c39ae7174f7275d4de183acb59a60ff8edb62fcaef0", size = 1956517, upload-time = "2026-06-24T20:51:20.554Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e3/00/3f53f00632fc07767d4c367815096c3cf80e4c3af28da8a1e29866b6843c/livekit_plugins_silero-1.6.4-py3-none-any.whl", hash = "sha256:b613f93c5aa4c7635ea12691795446ca2bdff6499417b42c7de8b14cc1df7a6f", size = 3904448, upload-time = "2026-06-24T20:51:18.615Z" },
-]
 
 [[package]]
 name = "livekit-plugins-soniox"
-version = "1.6.4"
-source = { registry = "https://pypi.org/simple" }
+version = "1.6.2"
+source = { git = "https://github.com/cshape/agents-expressive.git?subdirectory=livekit-plugins%2Flivekit-plugins-soniox&branch=cale%2Fexpressive-fish#1d7178232104a9b01d8372ea3574ac8cfcdb64ee" }
 dependencies = [
     { name = "livekit-agents" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/51/8f/9070e2fe15f751677ba9551942f55becb65e89cf9cf9af0662e571d7fdf1/livekit_plugins_soniox-1.6.4.tar.gz", hash = "sha256:8537ee104c4cc2817338784163299985dade6e4c7313aad4176b60a1923a9e44", size = 16367, upload-time = "2026-06-24T20:51:32.824Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9b/b8/3a90b7a1cda5ecd474237ad5e992673d188794899c3b13190da8923d0171/livekit_plugins_soniox-1.6.4-py3-none-any.whl", hash = "sha256:d6bdb5309dae97650c64da3cf34a997e89377a4bb76800dd4d820b8c8b72ee49", size = 18428, upload-time = "2026-06-24T20:51:31.732Z" },
 ]
 
 [[package]]

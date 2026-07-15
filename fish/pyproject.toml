@@ -9,7 +9,7 @@ description = "LiveKit Agents worker: Fish Audio TTS voice agent with a Beyond P
 requires-python = ">=3.10, <3.15"
 
 dependencies = [
-    "livekit-agents[soniox,openai,silero,bey]>=1.6.0",
+    "livekit-agents[bey,openai,silero,soniox]>=1.6.0",
     "livekit-plugins-fishaudio>=1.6.0",
     "python-dotenv",
 ]
@@ -25,6 +25,22 @@ dev = [
 # yarl 1.24.1 was published with only a cp310 wheel and no sdist, so it can't
 # install on Python 3.11+. Remove this once upstream uploads the remaining wheels.
 constraint-dependencies = ["yarl<1.24"]
+
+# Same SDK fork as livekit-demo (`cale/expressive-fish`): its fishaudio plugin keeps
+# one prewarmed `/v1/tts/live` websocket per session (utils.ConnectionPool + a real
+# prewarm() the framework calls at agent-activity start), so the first utterance
+# skips the ~330ms handshake and later replies reuse the warm socket. The fork is at
+# 1.6.2 while PyPI plugins are on 1.6.4 and require livekit-agents>=1.6.4 — installing
+# any plugin from PyPI would bump the SDK off the fork — so EVERY livekit plugin we
+# use is pinned to the same fork (they all live in its monorepo at 1.6.2).
+# Track upstream progress at livekit/agents PR #6116 (tina/expressive-mode).
+[tool.uv.sources]
+livekit-agents = { git = "https://github.com/cshape/agents-expressive.git", branch = "cale/expressive-fish", subdirectory = "livekit-agents" }
+livekit-plugins-fishaudio = { git = "https://github.com/cshape/agents-expressive.git", branch = "cale/expressive-fish", subdirectory = "livekit-plugins/livekit-plugins-fishaudio" }
+livekit-plugins-bey = { git = "https://github.com/cshape/agents-expressive.git", branch = "cale/expressive-fish", subdirectory = "livekit-plugins/livekit-plugins-bey" }
+livekit-plugins-openai = { git = "https://github.com/cshape/agents-expressive.git", branch = "cale/expressive-fish", subdirectory = "livekit-plugins/livekit-plugins-openai" }
+livekit-plugins-silero = { git = "https://github.com/cshape/agents-expressive.git", branch = "cale/expressive-fish", subdirectory = "livekit-plugins/livekit-plugins-silero" }
+livekit-plugins-soniox = { git = "https://github.com/cshape/agents-expressive.git", branch = "cale/expressive-fish", subdirectory = "livekit-plugins/livekit-plugins-soniox" }
 
 [tool.setuptools.packages.find]
 where = ["src"]

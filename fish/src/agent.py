@@ -58,6 +58,24 @@ DEFAULT_LANGUAGE = "en"
 # the Beyond Presence dashboard (https://app.bey.dev).
 DEFAULT_AVATAR_ID = "b9be11b8-89fb-4227-8f86-4a881393cbdb"
 
+
+def _avatar_livekit_url() -> str:
+    """ws[s]:// LiveKit URL for the Beyond Presence avatar.
+
+    The bey plugin reads LIVEKIT_URL from the env and forwards it to Bey's API,
+    which requires a ws[s]:// URL. LiveKit Cloud Agents injects LIVEKIT_URL with an
+    https:// scheme, so Bey rejects it ("Invalid LiveKit URL"). Normalize the scheme
+    so the avatar starts identically locally, on Render, and on Cloud Agents (where
+    LIVEKIT_URL is otherwise already wss://).
+    """
+    url = os.getenv("LIVEKIT_URL", "")
+    if url.startswith("https://"):
+        return "wss://" + url[len("https://") :]
+    if url.startswith("http://"):
+        return "ws://" + url[len("http://") :]
+    return url
+
+
 # Languages to bias Soniox toward (Fish's strong code-switch set). Auto language
 # identification stays on, so this hints without restricting detection.
 LANGUAGE_HINTS = ["en", "zh", "ja", "es", "ar", "fr", "de", "ko", "pt", "it"]
@@ -208,13 +226,19 @@ async def my_agent(ctx: JobContext):
             params=soniox.STTOptions(
                 language_hints=LANGUAGE_HINTS,
                 enable_language_identification=True,
-                # Aggressive end-of-turn: was defaulting to 2000ms. Lower delay +
-                # higher sensitivity make Soniox finalize sooner on confident pauses.
+                # Max-aggressive end-of-turn (fish-bare-agent posture, Soniox knobs):
+                # 500ms is the plugin's floor for endpoint delay, and sensitivity 1.0
+                # makes endpoints as likely as the model allows — Soniox finalizes on
+                # the shortest confident pause it can. Back these off if the agent
+                # starts cutting users off mid-sentence.
                 # endpoint_sensitivity is stt-rt-v5 only (the plugin default model).
-                max_endpoint_delay_ms=700,
-                endpoint_sensitivity=0.4,
+                max_endpoint_delay_ms=500,
+                endpoint_sensitivity=1.0,
             )
         ),
+        # The fork's fishaudio plugin (see [tool.uv.sources] in pyproject.toml) keeps
+        # one prewarmed `/v1/tts/live` websocket per session — no config needed here;
+        # the framework calls the plugin's prewarm() at agent-activity start.
         tts=fishaudio.TTS(
             model="s2.1-pro",
             voice_id=voice_id,
@@ -241,7 +265,7 @@ async def my_agent(ctx: JobContext):
     # reroutes the session's audio output to it, so the avatar publishes synchronized
     # audio + video. Must run before session.start.
     avatar = bey.AvatarSession(avatar_id=os.getenv("BEY_AVATAR_ID", DEFAULT_AVATAR_ID))
-    await avatar.start(session, room=ctx.room)
+    await avatar.start(session, room=ctx.room, livekit_url=_avatar_livekit_url())
 
     # Start the session, which initializes the voice pipeline and warms up the models.
     await session.start(agent=Assistant(), room=ctx.room)
