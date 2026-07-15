@@ -27,10 +27,13 @@ FROM base AS build
 # gcc: C compiler needed for building Python packages with C extensions
 # g++: C++ compiler needed for building Python packages with C++ extensions
 # python3-dev: Python development headers needed for compilation
+# git: uv fetches livekit-agents + plugins from the expressive fork (a git source
+#      in pyproject.toml), so the build stage needs a git executable
 # We clean up the apt cache after installation to keep the image size down
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    git \
     python3-dev \
   && rm -rf /var/lib/apt/lists/*
 
