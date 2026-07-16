@@ -15,11 +15,21 @@ from livekit.agents import (
     cli,
 )
 from livekit.plugins import bey, fishaudio, silero, soniox
+from livekit.plugins.fishaudio import tts as fishaudio_tts
 
 from llm import build_llm
 
 logger = logging.getLogger("agent")
 load_dotenv(".env.local")
+
+# Fish s2.1-pro still stalls ~350-600ms right after its opening chunks (measured
+# 2026-07-15: playout headroom dips to ~24ms on a cold socket at the first-sentence
+# boundary). The avatar path can't ride that out: frames go to Bey's worker over a
+# datastream with no buffering, and Bey's playout underrun becomes a crackle baked
+# into the re-published track. Hold release until Fish's second chunk (~85ms later
+# start, ~500ms of buffer). The fork exposes this only as a module constant; it
+# shipped with 1 (off) on the assumption Fish had smoothed cold-start pacing.
+fishaudio_tts._PREBUFFER_CHUNKS = 2
 
 # Named dispatch: the frontend requests this exact agent name. Must match
 # `agentName` in web/app-config.ts. A mismatch = no agent dispatches, silently.
