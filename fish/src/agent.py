@@ -22,13 +22,14 @@ from llm import build_llm
 logger = logging.getLogger("agent")
 load_dotenv(".env.local")
 
-# Fish s2.1-pro still stalls ~350-600ms right after its opening chunks (measured
-# 2026-07-15: playout headroom dips to ~24ms on a cold socket at the first-sentence
-# boundary). The avatar path can't ride that out: frames go to Bey's worker over a
-# datastream with no buffering, and Bey's playout underrun becomes a crackle baked
-# into the re-published track. Hold release until Fish's second chunk (~85ms later
-# start, ~500ms of buffer). The fork exposes this only as a module constant; it
-# shipped with 1 (off) on the assumption Fish had smoothed cold-start pacing.
+# Fish s2.1-pro's origin pacing is mostly clean, but ~5-7% of generations deliver
+# the second chunk 400-600ms late (probed 2026-07-15 on /v1/tts/live directly:
+# 3/60 requests underran by 100-180ms inside the first half-second; median chunk 2
+# lands ~100ms after chunk 1). The avatar path can't ride that out: frames go to
+# Bey's worker over a datastream with no buffering, and Bey's playout underrun
+# becomes a crackle baked into the re-published track. Holding release until
+# chunk 2 exists removes that failure class for ~100ms median extra TTFB. The
+# fork exposes this only as a module constant, and ships with 1 (off).
 fishaudio_tts._PREBUFFER_CHUNKS = 2
 
 # Named dispatch: the frontend requests this exact agent name. Must match
