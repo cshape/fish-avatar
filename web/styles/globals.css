@@ -122,27 +122,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-/* Fish Audio waveform loader — each bar scales vertically around its own center,
-   staggered by animation-delay to ripple like an equalizer. */
-@keyframes fish-waveform {
-  0%,
-  100% {
-    transform: scaleY(0.55);
-  }
-  50% {
-    transform: scaleY(1);
-  }
-}
-
-.fish-waveform-bar {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: fish-waveform 1.2s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .fish-waveform-bar {
-    animation: none;
-  }
-}

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Track } from 'livekit-client';
 import { motion } from 'motion/react';
 import { VideoTrack, useSessionContext, useTracks } from '@livekit/components-react';
-import { WaveformLoader } from '@/components/app/waveform-loader';
+import { FishTailLogo } from '@/components/app/fish-tail-logo';
 import { cn } from '@/lib/shadcn/utils';
 
 /**
@@ -75,7 +75,7 @@ function AvatarLoader({ className }: { className?: string }) {
         className
       )}
     >
-      <WaveformLoader className="w-44 md:w-52" />
+      <FishTailLogo className="w-44 md:w-52" />
       <div className="absolute inset-x-0 bottom-6 flex justify-center">
         <div className="bg-foreground/10 h-1.5 w-48 overflow-hidden rounded-full">
           <div
